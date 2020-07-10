@@ -1,0 +1,208 @@
+#initalizations
+import random
+import pygame
+import os
+pygame.init()
+
+#clock cycle
+clock = pygame.time.Clock()
+
+#image basics, constant throughout
+screen = pygame.display.set_mode((800, 600))
+pygame.display.set_caption("V-Dodge")
+icon = pygame.image.load('hand.png')
+pygame.display.set_icon(icon)
+
+#background information
+bg = pygame.image.load(os.path.join('nav5.png')).convert()
+bg1 = pygame.image.load(os.path.join('nav5.png')).convert()
+bgX = 0
+bgX2 = bg.get_width()
+
+#vdart logo player ship
+playerImg = pygame.image.load('vdart_logo.png')
+playerX = 80
+playerY = 300
+
+#values
+speed = 25
+vel = 10
+
+
+#asteroid intialization
+asteroidImg = []
+asteroidX = []
+asteroidY = []
+asteroidX_change = []
+asteroidY_change = []
+num_asteroid = 10
+
+#adds new asteroids to list
+for i in range(num_asteroid):
+    asteroidImg.append(pygame.image.load('asteroid.png'))
+    asteroidX.append(random.randint(650, 750))
+    asteroidY.append(random.randint(50, 450))
+    asteroidX_change.append(i)
+    asteroidY_change.append(i)
+
+#score
+score_value = 0
+font = pygame.font.Font('freesansbold.ttf', 32)
+
+#game over
+over_font = pygame.font.Font('freesansbold.ttf', 64)
+
+def game_over_text():
+    over_text = over_font.render("GAME OVER", True, (255, 255, 255))
+    screen.blit(over_text, (200, 250))
+
+def player(x, y):
+    screen.blit(playerImg, (x, y))
+
+def asteroid(x: object, y: object) -> object:
+    screen.blit(asteroidImg[i], (x, y))
+
+def redrawWindow():
+    screen.blit(bg, (bgX, 0))
+    screen.blit(bg, (bgX2, 0))
+    player(playerX, playerY)
+    asteroid(asteroidX[i], asteroidY[i])
+    pygame.display.update()
+
+#main while loop
+
+running_game = True
+winning = True
+score = 0
+good = True
+start = True
+delay = 0
+level = 0
+levelup = 0
+while running_game:
+    # redrawWindow()
+    clock.tick(speed)
+    clock.tick(speed)
+
+    #start screen
+    if start:
+        bg1 = pygame.image.load(os.path.join('earth63.jpg')).convert()
+        screen.blit(bg1, (0, 0))
+        screen.blit(over_font.render("Welcome to V-Dodge", True, (255, 255, 255)), (10, 150))
+        printnext = over_font.render("Game will begin shortly", True, (75, 225, 105))
+        screen.blit(printnext, (15, 300))
+        pygame.display.update()
+        while delay < 10000000:
+            delay += 1
+        winning = True
+        start = False
+
+    # checks if the game has be exited
+    while winning:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running_game = False
+                pygame.quit()
+                quit()
+
+        clock.tick(speed)
+        clock.tick(speed)
+        #scrolls images back
+        bgX -= 1.4 #move both background images back
+        bgX2 -= 1.4
+        if bgX < bg.get_width() * -1:  # If our bg is at the -width then reset its position
+            bgX = bg.get_width()
+
+        if bgX2 < bg.get_width() * -1:
+            bgX2 = bg.get_width()
+
+        #sets background
+        screen.fill((0, 0, 0))
+        screen.blit(bg, (0, 0))
+
+        #moves vdart logo
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+            playerY -= vel
+        if keys[pygame.K_DOWN]:
+            playerY += vel
+
+        #ensures that logo is still on screen
+        if playerY <= 0:
+            playerY = 0
+        elif playerY >= 566:
+            playerY = 566
+
+
+        levelup += 1
+        if levelup < 100:
+            num_asteroid = 3
+        if levelup > 200:
+            num_asteroid = 4
+        if levelup > 400:
+            num_asteroid = 5
+        if levelup > 600:
+            num_asteroid = 6
+        if levelup > 800:
+            num_asteroid = 7
+
+        #asteroids
+        for i in range(num_asteroid):
+            asteroidX[i] += asteroidX_change[i]
+            asteroidY[i] = asteroidY_change[i]
+            if asteroidX[i] > 0:
+                asteroidX_change[i] = -20
+            if asteroidX[i] <= 0:
+                rnd_x = random.randrange(650, 750)
+                rnd_y = random.randrange(40, 400)
+                asteroidX_change[i] = rnd_x
+                asteroidY_change[i] = rnd_y
+                score+=1
+        for i in range(num_asteroid):
+            if ((asteroidY[i] >= playerY and (asteroidY[i]) <= (playerY + 35)) and (asteroidX[i] >= playerX and (asteroidX[i]) <= (playerX + 60))):
+                winning = False
+                for i in range(num_asteroid):
+                    asteroidX[i] = 800
+                    asteroidY[i] = 600
+
+        redrawWindow()
+        player(playerX, playerY)
+        asteroid(asteroidX[0], asteroidY[0])
+        asteroid(asteroidX[1], asteroidY[1])
+        asteroid(asteroidX[2], asteroidY[2])
+        if num_asteroid >= 4:
+            asteroid(asteroidX[3], asteroidY[3])
+        if num_asteroid >= 5:
+            asteroid(asteroidX[4], asteroidY[4])
+        if num_asteroid >= 6:
+            asteroid(asteroidX[5], asteroidY[5])
+        if num_asteroid >= 7:
+            asteroid(asteroidX[6], asteroidY[6])
+
+        pygame.display.update()
+
+    #exit button check
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running_game = False
+            pygame.quit()
+            quit()
+
+    #game over page
+    screen.fill((0, 0, 0))
+    bg1 = pygame.image.load(os.path.join('earth.jpg')).convert()
+    screen.blit(bg1, (0, 0))
+    screen.blit(over_font.render("GAME OVER", True, (255, 255, 255)), (200, 150))
+    printscore = font.render("Score: " + str(score*10), True, (255, 24, 130))
+    screen.blit(printscore, (325, 250))
+    next = pygame.key.get_pressed()
+    printnext = over_font.render("PLAY AGAIN? PRESS UP", True, (75, 255, 105))
+    screen.blit(printnext, (15, 300))
+    pygame.display.update()
+    if next[pygame.K_UP]:
+        winning = True
+        score = 0
+        playerX = 80
+        playerY = 300
+        num_asteroid = 3
+        levelup = 0
