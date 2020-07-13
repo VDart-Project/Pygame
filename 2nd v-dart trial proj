@@ -1,0 +1,72 @@
+import random
+import math
+import pygame
+
+pygame.init()
+
+screen = pygame.display.set_mode((800, 600))
+
+background = pygame.image.load('gaaa.png')
+
+pygame.display.set_caption("V-Dart")
+icon = pygame.image.load('dd.png') #change to a dartboard image
+pygame.display.set_icon(icon)
+
+playerimg = pygame.image.load('archer.png') #change to a bow
+playerx = 50
+playery = 200
+playery_change = 0
+
+db_img = pygame.image.load('dd.png') #change to dartboard img
+dbx = 750
+dby = 300
+db_change = 0
+
+fireimg = pygame.image.load('r.png')
+firex = 0
+firey = 200
+firex_change = 50
+firey_change = 0
+fire_state = "ready"
+
+def player(x, y):
+    screen.blit(playerimg, (x, y))
+
+def db(x, y):
+    screen.blit(db_img, (x, y))
+
+def fire_fire(x, y):
+    global fire_state
+    fire_state = "fire"
+    screen.blit(fireimg, (x + 16, y + 10))
+
+vel = 5
+running = True
+while running:
+
+    screen.fill((128, 128, 128))
+    screen.blit(background, (0, 0))
+    player(0, 200)
+    db(575, 30)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+#
+#         if event.type == pygame.KEYDOWN:
+#             if event.key == pygame.K_UP:
+#                 playery_change = -8
+#             if event.key == pygame.K_DOWN:
+#                 playery_change = +8
+#             # if event.key == pygame.K_SPACE:
+#             #     if fire_state is "ready":
+#             #         firey = playery
+#             #         fire_fire(firex, firey)
+#
+#         if event.type == pygame.KEYUP:
+#             if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+#                 playery_change = 0
+#
+#     playery += playery_change
+    pygame.display.update()
