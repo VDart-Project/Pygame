@@ -1,0 +1,157 @@
+# intialize things
+import pygame
+import os
+import random
+import math
+pygame.init()
+
+# create the screen
+screen = pygame.display.set_mode((800, 600))
+
+#clock cycle
+# clock = pygame.time.Clock()
+# speed = 25
+# vel = 10
+# backgrounds
+hs_bg = pygame.image.load('gaaa.png')
+
+game_bg = pygame.image.load('gaaa.png')
+
+# title and icon
+pygame.display.set_caption("V-Dart")
+icon = pygame.image.load("dd.png")
+pygame.display.set_icon(icon)
+
+# player bow
+playerimg = pygame.image.load("bow.png")
+playerx = 20
+playery = 250
+playerx_change = 0
+playery_change = 0
+
+# target
+dbimg = pygame.image.load("db.png")
+dbx = 577
+dby = random.randint(20, 150)
+dbx_change = 0
+dby_change = 4
+
+# bullet img
+fireimg = pygame.image.load('vdart_logo.png')
+firex = 120
+firey = 0
+firex_change = 50
+firey_change = 0
+fire_state = "ready"
+
+hs_font = pygame.font.SysFont('comicsansms.ttf', 64)
+
+def player(x, y):
+    screen.blit(playerimg, (x, y))
+
+
+def db(x, y):
+    screen.blit(dbimg, (x, y))
+
+def fire_bullet(x, y):
+    global fire_state
+    fire_state = "fire"
+    screen.blit(fireimg, (x + 0, y + 45))
+
+def iscollision(dbx, dby, firex, firey):
+    distance = math.sqrt((math.pow(firex - dbx, 2)) + (math.pow(firey - dby, 2)))
+    if distance < 25:
+        return True
+    else:
+        return False
+
+
+# game loop
+running = True
+winning = True
+start = True
+score = 0
+delay = 0
+level = 0
+level_up = 0
+while running:
+    # clock.tick(speed)
+    # clock.tick(speed)
+    #home screen
+    if start:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running_game = False
+                pygame.quit()
+                quit()
+        screen.fill((0, 0, 0))
+        screen.blit(hs_bg, (0, 0))
+    #     screen.blit(hs_font.render("Welcome to V-Dart", True, (255, 24, 130)), (180, 250))
+    #     print_next = hs_font.render("Game will begin shortly", True, (255, 24, 130))
+    #     screen.blit(print_next, (150, 300))
+    #     pygame.display.update()
+    #
+    #     while delay < 5000000:
+    #         delay += 1
+    #     winning = True
+    #     start = False
+
+    # for closing the window
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        # if keystroke is been pressed
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                playery_change = -8
+            if event.key == pygame.K_DOWN:
+                playery_change = +8
+            if event.key == pygame.K_SPACE:
+                if fire_state == "ready":
+                    firey = playery
+                    fire_bullet(firex, firey)
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                playery_change = 0
+
+    playery += playery_change
+
+    # boundaries of player bow
+    if playery <= 10:
+        playery = 10
+    elif playery >= 470:
+        playery = 470
+
+    if firex >= 800:
+        firex = 150
+        fire_state = "ready"
+    
+
+
+    if fire_state == "fire":
+        if ((firey >= dby and (firey) <= (dby + 300)) and (firex >= dbx)):
+            collision = True
+            for i in range(1):
+                firex = 800
+                firey = 600
+        fire_bullet(firex, firey)
+        firex += firex_change
+    # Collision
+    collision = iscollision(firex, firey, dbx, dby)
+    if collision:
+        firex = 20
+        fire_state = "ready"
+        score += 1
+        print(score)
+    # boundaries of db
+    if dby <= -18:
+        dby_change = 4
+    elif dby >= 120:
+        dby_change = -4
+    dby += dby_change
+
+    player(playerx, playery)
+    db(dbx, dby)
+    # to update screen (important)
+    pygame.display.update()
