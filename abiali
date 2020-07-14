@@ -1,0 +1,125 @@
+import pygame
+import random
+import math
+
+# intialize the pygame
+pygame.init()
+
+# creat the screen
+screen = pygame.display.set_mode((800, 600))
+
+# creat the background
+background = pygame.image.load('gaaa.png')
+
+# title and icon
+pygame.display.set_caption("v_dart")
+# icon = pygame.image.load("")  # put icon image
+# pygame.display.set_icon(icon)
+
+# player bow
+playerimg = pygame.image.load("bow.png")
+playerx = 20
+playery = 500
+playerx_change = 0
+playery_change = 0
+
+# target
+dbimg = pygame.image.load("db.png")
+dbx = 550
+dby = random.randint(20, 100)
+dbx_change = 0
+dby_change = 8
+
+# bullet img
+fireimg = pygame.image.load('r.png')
+firex = 20
+firey = 0
+firex_change = 45
+firey_change = 0
+fire_state = "ready"
+
+
+def player(x, y):
+    screen.blit(playerimg, (x, y))
+
+
+def target(x, y):
+    screen.blit(dbimg, (x, y))
+
+
+def fire_bullet(x, y):
+    global fire_state
+    fire_state = "fire"
+    screen.blit(fireimg, (x + 16, y + 55))
+
+
+def iscollision(cactusx, cactusy, firex, firey):
+    distance = math.sqrt((math.pow(cactusx - firex, 2)) + (math.pow(cactusy - firey, 2)))
+    if distance < 35:
+        return True
+    else:
+        return False
+
+
+# game loop
+running = True
+while running:
+
+    # to put RGB value
+    screen.fill((128, 128, 128))
+
+    # backgroun image
+    screen.blit(background, (0, 0))
+
+    # for closing the window
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        # if keystrock is been pressed
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                playery_change = -8
+            if event.key == pygame.K_DOWN:
+                playery_change = +8
+            if event.key == pygame.K_SPACE:
+                if fire_state is "ready":
+                    firey = playery
+                    fire_bullet(firex, firey)
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                playery_change = 0
+
+    playery += playery_change
+
+    # boundaries of player bow
+    if playery <= 10:
+        playery = 10
+    elif playery >= 470:
+        playery = 470
+
+    if firex >= 800:
+        firex = 150
+        fire_state = "ready"
+
+    if fire_state is "fire":
+        fire_bullet(firex, firey)
+        firex += firex_change
+
+    collision = iscollision(firex, firey, dbx, dby, )
+    if collision:
+        firex = 150
+        fire_state = "ready"
+    dby += dby_change
+
+    # boundaries of db
+    if dby <= 0:
+        dby_change = 8
+    elif dby >= 120:
+        dby_change = -8
+
+    player(playerx, playery)
+
+    target(dbx, dby)
+    # to update screen (important)
+    pygame.display.update()
