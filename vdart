@@ -1,0 +1,145 @@
+import pygame
+import os
+
+pygame.init()
+
+font = pygame.font.Font('freesansbold.ttf', 32)
+over_font = pygame.font.Font('freesansbold.ttf', 64)
+
+clock = pygame.time.Clock()
+
+#image basics, constant throughout
+screen = pygame.display.set_mode((999, 646))
+pygame.display.set_caption("V-Dart Game")
+
+bg10 = pygame.image.load(os.path.join('start image.jpg')).convert()
+bg = pygame.image.load(os.path.join('dart90.jpeg')).convert()
+bg1 = pygame.image.load(os.path.join('back.jpg')).convert()
+
+playerImg = pygame.image.load('vdart_logo.png')
+playerX = 300
+playerY = 300
+
+def player(x, y):
+    screen.blit(playerImg, (x, y))
+
+def redrawWindow():
+    screen.blit(bg, (0, 0))
+    player(playerX, playerY)
+    pygame.display.update()
+
+run = True
+speed = 25
+vel = 1
+game = True
+time = 0
+finalX = 0
+delay = 0
+finalY = 0
+error1 = False
+won = False
+playing = True
+start = True
+zoom = True
+animation = True
+animX = 145
+animY = 300
+while run:
+    clock.tick(speed)
+    clock.tick(speed)
+    if start:
+        screen.fill((0, 0, 0))
+        screen.blit(bg10, (0, 0))
+        screen.blit(over_font.render("Welcome to V-Dart", True, (255, 255, 255)), (10, 150))
+        printnext = over_font.render("Game will begin shortly", True, (255, 225, 255))
+        screen.blit(printnext, (15, 300))
+        pygame.display.update()
+        while delay < 10000000:
+            delay += 1
+        start = False
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running_game = False
+            pygame.quit()
+            quit()
+    while playing:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running_game = False
+                pygame.quit()
+                quit()
+        while game:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running_game = False
+                    pygame.quit()
+                    quit()
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_UP]:
+                playerY -= vel
+            if keys[pygame.K_DOWN]:
+                playerY += vel
+            if keys[pygame.K_LEFT]:
+                playerX -= vel
+            if keys[pygame.K_RIGHT]:
+                playerX += vel
+            if playerY < 0:
+                playerY = 0
+            elif playerY >= 850:
+                playerY = 850
+            if playerX < 0:
+                playerX = 0
+            elif playerX >= 790:
+                playerX = 790
+            if keys[pygame.K_SPACE]:
+                finalX = playerX
+                finalY = playerY
+                if (finalX < 105 or finalX > 716) and (finalY < 118 or finalY > 709):
+                    error1 = True
+                else:
+                    playing = False
+                game = False
+            screen.fill((0, 0, 0))
+            screen.blit(bg, (0, 0))
+            player(playerX, playerY)
+            time += 1
+            pygame.display.update()
+        if error1:
+            printerror = font.render("Error: Arrow outside of board", True, (255, 24, 130))
+            screen.blit(printerror,  (325, 250))
+            pygame.display.update()
+            while delay < 10000000:
+                delay += 1
+            game = True
+            delay = 0
+            time = 0
+        error1 = False
+    screen.fill((0, 0, 0))
+    #screen.blit(bg1, (0, 0))
+    if animation:
+        while animX < finalX:
+            animX += .5
+            #animY += .25
+            screen.blit(bg, (0, 0))
+            player(animX, finalY)
+            pygame.display.update()
+        animation = False
+
+    score = (finalX + finalY) - (time - 1000)
+    printscore = font.render("Score: " + str(score), True, (255, 24, 130))
+    screen.blit(printscore, (325, 250))
+    printnext = over_font.render("PLAY AGAIN? PRESS UP", True, (255, 255, 255))
+    screen.blit(printnext, (15, 300))
+    pygame.display.update()
+    next = pygame.key.get_pressed()
+    if next[pygame.K_UP]:
+        playing = True
+        game = True
+        playerY = 300
+        playerX = 300
+        time = 0
+        animation = True
+        animX = 345
+        animY = 300
+
