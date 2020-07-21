@@ -4,14 +4,13 @@ import math
 from pygame import mixer
 import sound
 
-
 pygame.init()
 
 screen = pygame.display.set_mode((800, 600))
 
 background = pygame.image.load('in.png')
 
-#background music
+# background music
 mixer.music.load('background.wav')
 mixer.music.play(-1)
 
@@ -48,7 +47,6 @@ for i in range(num_of_robot):
     roboty.append(random.randint(100, 450))
     robotx_change.append(3)
 
-
 fireimg = pygame.image.load('r.png')
 firex = 0
 firey = 200
@@ -70,7 +68,7 @@ def show_score(x, y):
 
 
 def game_over_text():
-    over_text = over_font.render(" GAME OVER:" , True, (225, 0, 2))
+    over_text = over_font.render(" GAME OVER:", True, (225, 0, 2))
     screen.blit(over_text, (200, 250))
 
 
@@ -80,6 +78,7 @@ def player(x, y):
 
 def cactus(x, y, i):
     screen.blit(cactusimg[i], (x, y))
+
 
 def robot(x, y, i):
     screen.blit(robotimg[i], (x, y))
@@ -98,6 +97,7 @@ def iscollision(robotx, roboty, firex, firey):
     else:
         return False
 
+
 def ifcollision(cactusx, cactusy, firex, firey):
     distance = math.sqrt((math.pow(cactusx - firex, 2)) + (math.pow(cactusy - firey, 2)))
     if distance < 35:
@@ -105,9 +105,11 @@ def ifcollision(cactusx, cactusy, firex, firey):
     else:
         return False
 
+
 game_over = False
 game = True
 running = True
+delay = 0
 while running:
     while game:
         screen.fill((128, 128, 128))
@@ -125,7 +127,7 @@ while running:
                     playery_change = +8
                 if event.key == pygame.K_SPACE:
                     if fire_state is "ready":
-                        bullet_sound =mixer.sound('laser.wav')
+                        bullet_sound = mixer.sound('laser.wav')
                         bullet_sound.play()
                         firey = playery
                         fire_fire(firex, firey)
@@ -160,8 +162,8 @@ while running:
             if cactusx[i] < 50:
                 for j in range(num_of_cactus):
                     cactusx[j] = 2000
-                #game_over_text()
-                game_over = True
+                # game_over_text()
+                #game_over = True
                 game = False
                 break
 
@@ -190,8 +192,8 @@ while running:
             if robotx[i] < 50:
                 for j in range(num_of_robot):
                     robotx[j] = 2000
-                #game_over_text()
-                game_over = True
+                # game_over_text()
+                #game_over = True
                 game = False
                 break
 
@@ -207,19 +209,22 @@ while running:
                 score_value += 1
                 robotx[i] = random.randint(400, 736)
                 roboty[i] = random.randint(100, 450)
-            robot( robotx[i],  roboty[i], i)
+            robot(robotx[i], roboty[i], i)
 
         player(playerx, playery)
         show_score(textx, texty)
         pygame.display.update()
-
-    while game_over:
-        over_text = over_font.render(" GAME OVER:" , True, (225, 0, 2))
-        screen.blit(over_text, (200, 250))
-        pygame.display.update()
-        delay = 0
-        while delay < 10000000:
-            delay += 1 
-        game_over = False
-        game = True
         
+    
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running_game = False
+            pygame.quit()
+            quit()
+    screen.fill((0, 0, 0))
+    if delay > 300000:
+        game = True
+    delay += 1
+    over_text = over_font.render(" GAME OVER:", True, (225, 0, 2))
+    screen.blit(over_text, (200, 250))
+    pygame.display.update()
