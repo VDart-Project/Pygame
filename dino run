@@ -105,105 +105,121 @@ def ifcollision(cactusx, cactusy, firex, firey):
     else:
         return False
 
-
+game_over = False
+game = True
 running = True
 while running:
-    screen.fill((128, 128, 128))
+    while game:
+        screen.fill((128, 128, 128))
 
-    screen.blit(background, (0, 0))
+        screen.blit(background, (0, 0))
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                playery_change = -8
-            if event.key == pygame.K_DOWN:
-                playery_change = +8
-            if event.key == pygame.K_SPACE:
-                if fire_state is "ready":
-                    bullet_sound =mixer.sound('laser.wav')
-                    bullet_sound.play()
-                    firey = playery
-                    fire_fire(firex, firey)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    playery_change = -8
+                if event.key == pygame.K_DOWN:
+                    playery_change = +8
+                if event.key == pygame.K_SPACE:
+                    if fire_state is "ready":
+                        bullet_sound =mixer.sound('laser.wav')
+                        bullet_sound.play()
+                        firey = playery
+                        fire_fire(firex, firey)
 
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                playery_change = 0
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                    playery_change = 0
 
-    playery += playery_change
+        playery += playery_change
 
-    if playery <= 100:
-        playery = 100
-    elif playery >= 450:
-        playery = 450
+        if playery <= 100:
+            playery = 100
+        elif playery >= 450:
+            playery = 450
 
-    if firex >= 800:
-        firex = 150
-        fire_state = "ready"
+        if firex >= 800:
+            firex = 150
+            fire_state = "ready"
 
-    if fire_state is "fire":
-        fire_fire(firex, firey)
-        firex += firex_change
+        if fire_state is "fire":
+            fire_fire(firex, firey)
+            firex += firex_change
 
-    collision = iscollision(firex, firey, cactusx[i], cactusy[i], )
-    if collision:
-        firex = 150
-        fire_state = "ready"
-        score_value += 1
-        cactusx[i] = random.randint(400, 736)
-        cactusy[i] = random.randint(100, 450)
-    for i in range(num_of_cactus):
-        if cactusx[i] < 50:
-            for j in range(num_of_cactus):
-                cactusx[j] = 2000
-            game_over_text()
-            break
-
-        cactusx[i] += cactusx_change[i]
-
-        cactusx_change[i] = -2.4
         collision = iscollision(firex, firey, cactusx[i], cactusy[i], )
         if collision:
-            collision_sound = sound('explosive.wav')
-            collision_sound.play()
             firex = 150
             fire_state = "ready"
             score_value += 1
             cactusx[i] = random.randint(400, 736)
             cactusy[i] = random.randint(100, 450)
-        cactus(cactusx[i], cactusy[i], i)
+        for i in range(num_of_cactus):
+            if cactusx[i] < 50:
+                for j in range(num_of_cactus):
+                    cactusx[j] = 2000
+                #game_over_text()
+                game_over = True
+                game = False
+                break
 
-    explosion = ifcollision(firex, firey, robotx[i], roboty[i], )
-    if explosion:
-        firex = 150
-        fire_state = "ready"
-        score_value += 1
-        robotx[i] = random.randint(400, 736)
-        roboty[i] = random.randint(100, 450)
-    for i in range(num_of_robot):
-        if robotx[i] < 50:
-            for j in range(num_of_robot):
-                robotx[j] = 2000
-            game_over_text()
-            break
+            cactusx[i] += cactusx_change[i]
 
-        robotx[i] += robotx_change[i]
+            cactusx_change[i] = -2.4
+            collision = iscollision(firex, firey, cactusx[i], cactusy[i], )
+            if collision:
+                collision_sound = sound('explosive.wav')
+                collision_sound.play()
+                firex = 150
+                fire_state = "ready"
+                score_value += 1
+                cactusx[i] = random.randint(400, 736)
+                cactusy[i] = random.randint(100, 450)
+            cactus(cactusx[i], cactusy[i], i)
 
-        robotx_change[i] = -2.4
         explosion = ifcollision(firex, firey, robotx[i], roboty[i], )
         if explosion:
-            collision_sound = mixer.sound('explosive.wav')
-            collision_sound.play()
             firex = 150
             fire_state = "ready"
             score_value += 1
             robotx[i] = random.randint(400, 736)
             roboty[i] = random.randint(100, 450)
-        robot( robotx[i],  roboty[i], i)
+        for i in range(num_of_robot):
+            if robotx[i] < 50:
+                for j in range(num_of_robot):
+                    robotx[j] = 2000
+                #game_over_text()
+                game_over = True
+                game = False
+                break
 
-    player(playerx, playery)
-    show_score(textx, texty)
+            robotx[i] += robotx_change[i]
 
-    pygame.display.update()
+            robotx_change[i] = -2.4
+            explosion = ifcollision(firex, firey, robotx[i], roboty[i], )
+            if explosion:
+                collision_sound = mixer.sound('explosive.wav')
+                collision_sound.play()
+                firex = 150
+                fire_state = "ready"
+                score_value += 1
+                robotx[i] = random.randint(400, 736)
+                roboty[i] = random.randint(100, 450)
+            robot( robotx[i],  roboty[i], i)
+
+        player(playerx, playery)
+        show_score(textx, texty)
+        pygame.display.update()
+
+    while game_over:
+        over_text = over_font.render(" GAME OVER:" , True, (225, 0, 2))
+        screen.blit(over_text, (200, 250))
+        pygame.display.update()
+        delay = 0
+        while delay < 10000000:
+            delay += 1 
+        game_over = False
+        game = True
+        
